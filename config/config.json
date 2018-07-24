@@ -1,0 +1,17 @@
+{
+  "development": {
+    "database": "library",
+    "host": "127.0.0.1",
+    "dialect": "sqlite"
+  },
+  "test": {
+    "database": "library",
+    "host": "127.0.0.1",
+    "dialect": "sqlite"
+  },
+  "production": {
+    "database": "library",
+    "host": "127.0.0.1",
+    "dialect": "sqlite"
+  }
+}

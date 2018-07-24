@@ -1,0 +1,11 @@
+doctype html
+html(lang="en")
+    head
+        block vars
+        title #{title}
+        style
+            include ../includes/css/styles.css
+    body
+        include ../includes/navigation
+        h1 #{title}
+        block content
