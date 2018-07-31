@@ -1,0 +1,8 @@
+extends ../layouts/default
+
+block vars
+    - var title = "New Book"
+
+block content
+    form(action="/books", method="post")
+        include ../includes/book_form
