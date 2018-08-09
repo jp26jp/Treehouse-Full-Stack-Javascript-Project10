@@ -5,9 +5,11 @@ var createError    = require("http-errors"),
     logger         = require("morgan"),
     methodOverride = require("method-override")
 
-var indexRouter = require("./routes/index"),
-    usersRouter = require("./routes/users"),
-    booksRouter = require("./routes/books")
+var indexRouter   = require("./routes/index"),
+    usersRouter   = require("./routes/users"),
+    booksRouter   = require("./routes/books"),
+    loansRouter   = require("./routes/loans"),
+    patronsRouter = require("./routes/patrons")
 
 var app = express()
 
@@ -25,6 +27,8 @@ app.use(express.static(path.join(__dirname, "public")))
 app.use("/", indexRouter)
 app.use("/users", usersRouter)
 app.use("/books", booksRouter)
+app.use("/loans", loansRouter)
+app.use("/patrons", patronsRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

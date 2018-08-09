@@ -1,0 +1,20 @@
+extends ../components/layouts/default
+
+block content
+    p
+        a(href="/loans/new/", class="button") Create New Loan
+    table
+        thead
+            tr
+                th Book
+                th Patron
+                th Loaned On
+                th Return By
+        tbody
+            each loan in loans
+                tr
+                    td
+                        a(href="/loans/" + loan.id) #{loan.book_id}
+                    td #{loan.patron_id}
+                    td #{loan.loaned_on}
+                    td #{loan.return_by}

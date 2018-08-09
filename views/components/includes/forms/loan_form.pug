@@ -1,0 +1,24 @@
+p
+    label Book
+    if books !== undefined
+        select(name="book_id")
+            each book in books
+                option(value=book) #{book.title}
+    else
+        input(name="book_title", type="text", value=loan.book_id)
+p
+    label Patron
+    if patrons !== undefined
+        select(name="patron_id")
+            each patron in patrons
+                option(value=patron.id) #{patron.first_name} #{patron.last_name}
+    else
+        input(name="patron_id", type="text", value=loan.patron_id)
+p
+    label Loaned on:
+    input(name="loaned_on", type="text", value=loan.loaned_on)
+p
+    label Return by:
+    input(name="return_by", type="text", value=loan.return_by)
+p
+    input(type="submit" value="Create New Loan")

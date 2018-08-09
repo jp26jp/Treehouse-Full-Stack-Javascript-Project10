@@ -1,6 +1,21 @@
-extends ../layouts/default
-
-block vars
-    - var title = "Library Manager"
+extends ../components/layouts/default
 
 block content
+    p
+        a(href="/books/new/", class="button") Create New Book
+    include ../components/includes/navigations/filter
+    table
+        thead
+            tr
+                th Title
+                th Author
+                th Genre
+                th Year Released
+        tbody
+            each book in books
+                tr
+                    td
+                        a(href="/books/" + book.id) #{book.title}
+                    td #{book.author}
+                    td #{book.genre}
+                    td #{book.year_released}

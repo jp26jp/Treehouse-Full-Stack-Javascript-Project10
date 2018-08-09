@@ -1,11 +1,10 @@
 doctype html
 html(lang="en")
     head
-        block vars
         title #{title}
         style
             include ../includes/css/styles.css
     body
-        include ../includes/navigation
+        include ../includes/navigations/navigation
         h1 #{title}
         block content

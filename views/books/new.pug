@@ -1,8 +1,5 @@
-extends ../layouts/default
-
-block vars
-    - var title = "New Book"
+extends ../components/layouts/default
 
 block content
     form(action="/books", method="post")
-        include ../includes/book_form
+        include ../components/includes/forms/book_form

@@ -1,0 +1,5 @@
+extends ../components/layouts/default
+
+block content
+    form(action="/loans/" + loan.id + "?_method=PUT", method="post")
+        include ../components/includes/forms/loan_form
