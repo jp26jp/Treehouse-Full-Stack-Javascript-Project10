@@ -6,11 +6,10 @@ module.exports = (sequelize, DataTypes) => {
         address   : DataTypes.STRING,
         email     : DataTypes.STRING,
         library_id: DataTypes.STRING,
-        zip_code  : DataTypes.INTEGER,
+        zip_code  : DataTypes.INTEGER
     }, {})
     Patron.associate = function (models) {
-        // associations can be defined here
-        // Patron.hasMany(models.Loan)
+        Patron.hasMany(models.Loan, {foreignKey: 'patron_id'});
     }
     return Patron
 }

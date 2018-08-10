@@ -1,17 +1,17 @@
-var createError    = require("http-errors"),
-    express        = require("express"),
-    path           = require("path"),
-    cookieParser   = require("cookie-parser"),
-    logger         = require("morgan"),
-    methodOverride = require("method-override")
+const createError    = require("http-errors"),
+      express        = require("express"),
+      path           = require("path"),
+      cookieParser   = require("cookie-parser"),
+      logger         = require("morgan"),
+      methodOverride = require("method-override")
 
-var indexRouter   = require("./routes/index"),
-    usersRouter   = require("./routes/users"),
-    booksRouter   = require("./routes/books"),
-    loansRouter   = require("./routes/loans"),
-    patronsRouter = require("./routes/patrons")
+const indexRouter   = require("./routes/index"),
+      usersRouter   = require("./routes/users"),
+      booksRouter   = require("./routes/books"),
+      loansRouter   = require("./routes/loans"),
+      patronsRouter = require("./routes/patrons")
 
-var app = express()
+const app = express()
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"))

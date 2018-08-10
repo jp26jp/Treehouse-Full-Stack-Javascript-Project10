@@ -2,19 +2,16 @@
   "development": {
     "database": "library",
     "host": "127.0.0.1",
-    "operatorsAliases": false,
     "dialect": "sqlite"
   },
   "test": {
     "database": "library",
     "host": "127.0.0.1",
-    "operatorsAliases": false,
     "dialect": "sqlite"
   },
   "production": {
     "database": "library",
     "host": "127.0.0.1",
-    "operatorsAliases": false,
     "dialect": "sqlite"
   }
 }

@@ -1,7 +1,7 @@
-var express = require("express")
-var router = express.Router()
-var Book = require("../models").Book
-var Loan = require("../models").Loan
+var express = require("express"),
+    router  = express.Router(),
+    Book    = require("../models").Book,
+    Loan    = require("../models").Loan
 
 /* GET books listing. */
 router.get("/", (req, res) => {
@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
 /* Create a new book form. */
 router.get("/new", (req, res) => res.render("books/new", {
     title: "New Book",
-    book: {}
+    book : {}
 }))
 
 /* GET overdue books */
@@ -28,7 +28,6 @@ router.get("/overdue", (req, res) => {
         }))
         .catch(error => res.send(500, error))
 })
-
 
 /* POST create book. */
 router.post("/", (req, res) => {

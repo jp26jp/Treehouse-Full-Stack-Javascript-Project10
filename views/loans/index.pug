@@ -10,11 +10,15 @@ block content
                 th Patron
                 th Loaned On
                 th Return By
+                th Returned On
+                th Action
         tbody
             each loan in loans
                 tr
-                    td
-                        a(href="/loans/" + loan.id) #{loan.book_id}
-                    td #{loan.patron_id}
+                    td: a(href="/loans/" + loan.id)
+                        = loan.Book.title
+                    td #{loan.Patron.first_name} #{loan.Patron.last_name}
                     td #{loan.loaned_on}
                     td #{loan.return_by}
+                    td #{loan.return_on}
+                    td: form(action="/loans/" + loan.id + "?_method=DELETE", method="post"): input(type="submit", value = "Yes, I am")
