@@ -14,8 +14,7 @@ block content
         tbody
             each book in books
                 tr
-                    td
-                        a(href="/books/" + book.id) #{book.title}
+                    td: a(href="/books/" + book.id) #{book.title}
                     td #{book.author}
                     td #{book.genre}
-                    td #{book.year_released}
+                    td #{book.first_published}

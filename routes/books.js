@@ -15,8 +15,9 @@ router.get("/", (req, res) => {
 
 /* Create a new book form. */
 router.get("/new", (req, res) => res.render("books/new", {
-    title: "New Book",
-    book : {}
+    title : "New Book",
+    button: "Create New Book",
+    book  : {}
 }))
 
 /* GET overdue books */
@@ -59,6 +60,7 @@ router.get("/:id", function (req, res) {
                     author         : book.author,
                     genre          : book.genre,
                     first_published: book.first_published,
+                    button         : "Update Book",
                 })
             } else {
                 res.send(404)

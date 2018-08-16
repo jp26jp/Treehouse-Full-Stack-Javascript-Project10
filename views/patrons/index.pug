@@ -3,6 +3,7 @@ extends ../components/layouts/default
 block content
     p
         a(href="/patrons/new/", class="button") Create New Patron
+    include ../components/includes/navigations/filter
     table
         thead
             tr
@@ -19,4 +20,6 @@ block content
                     td #{patron.address}
                     td #{patron.email}
                     td #{patron.library_id}
+                    // form(action="/patrons/" + patron.id + "?_method=DELETE", method="post"): input.button(type="submit")
                     td #{patron.zip_code}
+
