@@ -7,8 +7,9 @@ var express = require("express"),
 router.get("/", (req, res) => {
     Book.findAll({order: [["createdAt", "DESC"]]})
         .then(books => res.render("books/index", {
-            title: "Books",
-            books: books,
+            title : "Books",
+            errors: "undefined",
+            books : books,
         }))
         .catch(error => res.send(500, error))
 })
@@ -16,6 +17,7 @@ router.get("/", (req, res) => {
 /* Create a new book form. */
 router.get("/new", (req, res) => res.render("books/new", {
     title : "New Book",
+    errors: "undefined",
     button: "Create New Book",
     book  : {}
 }))
@@ -34,20 +36,17 @@ router.get("/overdue", (req, res) => {
 router.post("/", (req, res) => {
     Book.create(req.body)
         .then(book => res.redirect("/books/" + book.id))
+        .catch(error => {
+            if (error.name === "SequelizeValidationError") {
+                res.render("books/new", {
+                    title  : "New Book",
+                    book   : Book.build(req.body),
+                    errors : error.errors,
+                    button : "Create New Book",
+                })
+            }
+        })
 })
-
-// /* Delete book form. */
-// router.get("/:id/delete", (req, res, next) => {
-//     Book.findById(req.params.id).then(function (book) {
-//         if (book) {
-//             res.render("books/delete", {book: book, title: "Delete Book"})
-//         } else {
-//             res.send(404)
-//         }
-//     }).catch(function (error) {
-//         res.send(500, error)
-//     })
-// })
 
 /* GET individual book. */
 router.get("/:id", function (req, res) {
@@ -60,6 +59,7 @@ router.get("/:id", function (req, res) {
                     author         : book.author,
                     genre          : book.genre,
                     first_published: book.first_published,
+                    errors         : "undefined",
                     button         : "Update Book",
                 })
             } else {
@@ -95,20 +95,5 @@ router.put("/:id", (req, res) => {
         })
         .catch(error => res.send(500, error))
 })
-//
-// /* DELETE individual book. */
-// router.delete("/:id", (req, res, next) => {
-//     Book.findById(req.params.id).then(function (book) {
-//         if (book) {
-//             return book.destroy()
-//         } else {
-//             res.send(404)
-//         }
-//     }).then(function () {
-//         res.redirect("/books")
-//     }).catch(function (error) {
-//         res.send(500, error)
-//     })
-// })
 
 module.exports = router

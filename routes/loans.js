@@ -9,7 +9,6 @@ let express   = require("express"),
 router.get("/", (req, res) => {
     Loan.findAll({include: [{all: true}]})
         .then(loans => {
-            console.log(loans)
             res.render("loans/index", {
                 title: "Loans",
                 loans: loans,
@@ -87,13 +86,24 @@ router.get("/new", (req, res) => {
 /* POST create loan. */
 router.post("/", (req, res) => {
     Loan.create(req.body)
-        .then(loan => {
-            res.redirect("/loans/return/" + loan.id)
-        })
+        .then(loan => res.redirect("/loans/return/" + loan.id))
         .catch(error => {
             if (error.name === "SequelizeValidationError") {
                 const promiseBooks   = getAllBooks(),
                       promisePatrons = getAllPatrons()
+            
+                Promise.all([promiseBooks, promisePatrons])
+                       .then(results => {
+                           res.render("loans/new", {
+                               title  : "New Loan",
+                               loan   : Loan.build(req.body),
+                               books  : results[0],
+                               patrons: results[1],
+                               errors : error.errors,
+                               button : "Create New Loan",
+                           })
+                       })
+            
                 renderNewLoanPage(res, promiseBooks, promisePatrons, "Create New Loan", error.errors)
             }
         })
@@ -110,6 +120,7 @@ router.get("/:id", function (req, res) {
                     patron_id: loan.patron_id,
                     loaned_on: loan.loaned_on,
                     return_by: loan.return_by,
+                    errors   : "undefined",
                 })
             } else {
                 res.send(404)
@@ -128,9 +139,7 @@ router.delete("/:id", function (req, res) {
                 res.send(404)
             }
         })
-        .then(() => {
-            res.redirect("/loans")
-        })
+        .then(() => res.redirect("/loans"))
 })
 
 router.get("/return/:id", function (req, res) {
@@ -163,10 +172,7 @@ router.put("/return/:id", function (req, res) {
 
 function getAllBooks() {
     return new Promise(resolve => {
-        Book.findAll({
-                         include: [{all: true}],
-                         order  : [["createdAt", "DESC"]]
-                     })
+        Book.findAll({include: [{all: true}]})
             .then(books => resolve(books))
     })
 }
@@ -182,7 +188,7 @@ function renderNewLoanPage(expressResponse, books, patrons, buttonText, errors =
     Promise.all([books, patrons])
            .then(results => {
                expressResponse.render("loans/new", {
-                   title  : "Loans",
+                   title  : "New Loan",
                    books  : results[0],
                    errors : errors,
                    patrons: results[1],

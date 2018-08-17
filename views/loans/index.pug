@@ -19,14 +19,14 @@ block content
                     tr
                         td: a(href="/loans/" + loan.id)
                             = loan.Book.title
-                        td #{loan.Patron.first_name} #{loan.Patron.last_name}
-                        td #{loan.getDateAsString(loan.loaned_on)}
-                        td #{loan.getDateAsString(loan.return_by)}
+                        td: a(href="/patrons/" + loan.Patron.id)
+                            = `${loan.Patron.first_name} ${loan.Patron.last_name}`
+                        td= loan.getDateAsString(loan.loaned_on)
+                        td= loan.getDateAsString(loan.return_by)
                         td
                             if loan.returned_on !== null
-                                #{loan.getDateAsString(loan.returned_on)}
+                                = loan.getDateAsString(loan.returned_on)
                         td
-                            form(action="/loans/" + loan.id + "?_method=DELETE", method="post"): input.button(type="submit")
                             if !loan.returned_on
                                 a.button(href="/loans/return/" + loan.id) Return Book
 

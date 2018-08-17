@@ -17,20 +17,12 @@ p
 p
     label Loaned on:
     input(name="loaned_on", type="text", value=loan.loaned_on)
-    //if errors !== "undefined"
-    //    each error in errors
-    //        if error.path === "loaned_on"
-    //            .error= error.message
+    +error("loaned_on")
 
 p
     label Return by:
     input(name="return_by", type="text", value=loan.return_by)
-    //if errors !== "undefined"
-    //    each error in errors
-    //        if error.path === "return_by"
-    //            .error= error.message
-
-    //input(hidden="true", name="returned_on", type="text", value=null)
+    +error("return_by")
 
 p
     input(type="submit" value=button)

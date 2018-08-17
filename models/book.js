@@ -4,26 +4,26 @@ module.exports = (sequelize, DataTypes) => {
         title          : {
             type    : DataTypes.STRING,
             validate: {
-                notEmpty: true,
+                notEmpty: {msg: "Cannot be empty"},
             }
         },
         author         : {
             type    : DataTypes.STRING,
             validate: {
-                notEmpty: true,
+                notEmpty: {msg: "Cannot be empty"},
             }
         },
         genre          : {
             type    : DataTypes.STRING,
             validate: {
-                notEmpty: true,
+                notEmpty: {msg: "Cannot be empty"},
             }
         },
         first_published: {
             type    : DataTypes.INTEGER,
             validate: {
-                notEmpty: true,
-                isInt   : true,
+                notEmpty: {msg: "Cannot be empty"},
+                isInt   : {msg: "Value must be a year (e.g. 2018"},
             }
         }
     }, {})
