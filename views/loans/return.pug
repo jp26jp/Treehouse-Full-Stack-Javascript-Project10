@@ -1,5 +1,8 @@
 extends ../components/layouts/default
 
+block vars
+    - var path = "/loans/"
+
 block content
     form(action=loan.id + "?_method=PUT", method="post")
         p

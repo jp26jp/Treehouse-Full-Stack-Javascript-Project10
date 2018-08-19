@@ -6,6 +6,8 @@ html(lang="en")
         style
             include ../includes/css/styles.css
     body
+        block vars
+            - var path = "/"
         include ../includes/navigations/navigation
         h1 #{title}
         block content

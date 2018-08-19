@@ -1,5 +1,8 @@
 extends ../components/layouts/default
 
+block vars
+    - var path = "/books/"
+
 block content
     form(action="/books/" + book.id + "?_method=PUT", method="post")
         include ../components/includes/forms/book_form

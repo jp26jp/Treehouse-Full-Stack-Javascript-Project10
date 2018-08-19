@@ -1,7 +1,8 @@
-var express = require("express"),
-    router  = express.Router(),
-    Book    = require("../models").Book,
-    Loan    = require("../models").Loan
+var express   = require("express"),
+    router    = express.Router(),
+    Sequelize = require("sequelize"),
+    Book      = require("../models").Book,
+    Loan      = require("../models").Loan
 
 /* GET books listing. */
 router.get("/", (req, res) => {
@@ -24,11 +25,39 @@ router.get("/new", (req, res) => res.render("books/new", {
 
 /* GET overdue books */
 router.get("/overdue", (req, res) => {
-    Loan.findAll({order: [["createdAt", "DESC"]]})
-        .then(books => res.render("books/index", {
-            title: "Overdue Books",
-            books: books,
-        }))
+    const Op = Sequelize.Op
+    Loan.findAll({
+                     include: [{model: Book}],
+                     where  : {
+                         return_by  : {[Op.lt]: new Date()},
+                         returned_on: null
+                     }
+                 })
+        .then(loans => {
+            if (loans) {
+                res.render("books/overdue", {
+                    title: "Overdue Books",
+                    loans: loans
+                })
+            }
+        })
+        .catch(error => res.send(500, error))
+})
+
+/* GET checked-out books */
+router.get("/checked-out", (req, res) => {
+    Loan.findAll({
+                     include: [{model: Book}],
+                     where  : {returned_on: null}
+                 })
+        .then(loans => {
+            if (loans) {
+                res.render("books/overdue", {
+                    title: "Checked Out Books",
+                    loans: loans
+                })
+            }
+        })
         .catch(error => res.send(500, error))
 })
 
@@ -39,10 +68,10 @@ router.post("/", (req, res) => {
         .catch(error => {
             if (error.name === "SequelizeValidationError") {
                 res.render("books/new", {
-                    title  : "New Book",
-                    book   : Book.build(req.body),
-                    errors : error.errors,
-                    button : "Create New Book",
+                    title : "New Book",
+                    book  : Book.build(req.body),
+                    errors: error.errors,
+                    button: "Create New Book",
                 })
             }
         })

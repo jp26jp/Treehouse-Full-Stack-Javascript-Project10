@@ -1,5 +1,8 @@
 extends ../components/layouts/default
 
+block vars
+    - var path = "/patrons/"
+
 block content
     form(action="/patrons/" + patron.id + "?_method=PUT", method="post")
         include ../components/includes/forms/patron_form

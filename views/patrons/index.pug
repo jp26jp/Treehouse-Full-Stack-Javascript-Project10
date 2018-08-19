@@ -1,9 +1,11 @@
 extends ../components/layouts/default
 
+block vars
+    - var path = "/patrons/"
+
 block content
     p
         a(href="/patrons/new/", class="button") Create New Patron
-    include ../components/includes/navigations/filter
     table
         thead
             tr
