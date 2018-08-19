@@ -1,32 +1,32 @@
 form
     p
-        label First Name
-        input(name="first_name", type="text", value=patron.first_name)
+        label(for='first_name') First Name
+        input(name="first_name", id="first_name", type="text", value=patron.first_name)
         +error("first_name")
 
     p
-        label Last Name
-        input(name="last_name", type="text", value=patron.last_name)
+        label(for='last_name') Last Name
+        input(name="last_name", id="last_name", type="text", value=patron.last_name)
         +error("last_name")
 
     p
-        label Address
-        input(name="address", type="text", value=patron.address)
+        label(for='address') Address
+        input(name="address", id="address", type="text", value=patron.address)
         +error("address")
 
     p
-        label Email
-        input(name="email", type="text", value=patron.email)
+        label(for='email') Email
+        input(name="email", id="email", type="text", value=patron.email)
         +error("email")
 
     p
-        label Library ID
-        input(name="library_id", type="text", value=patron.library_id)
+        label(for='library_id') Library ID
+        input(name="library_id", id="library_id", type="text", value=patron.library_id)
         +error("library_id")
 
     p
-        label Zip Code
-        input(name="zip_code", type="text", value=patron.zip_code)
+        label(for='zip_code') Zip Code
+        input(name="zip_code", id="zip_code", type="text", value=patron.zip_code)
         +error("zip_code")
 
     p

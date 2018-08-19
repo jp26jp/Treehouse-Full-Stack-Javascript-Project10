@@ -1,21 +1,21 @@
 p
-    label Title
-    input(name="title", type="text", value=book.title)
+    label(for='title') Title
+    input(name="title", id="title", type="text", value=book.title)
     +error("title")
 
 p
-    label Author
-    input(name="author", type="text", value=book.author)
+    label(for='author') Author
+    input(name="author", id="author", type="text", value=book.author)
     +error("author")
 
 p
-    label Genre
-    input(name="genre", type="text", value=book.genre)
+    label(for='genre') Genre
+    input(name="genre", id="genre", type="text", value=book.genre)
     +error("genre")
 
 p
-    label First Published
-    input(name="first_published", type="text", value=book.first_published)
+    label(for='first_published') First Published
+    input(name="first_published", id="first_published", type="text", value=book.first_published)
     +error("first_published")
 
 p
