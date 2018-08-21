@@ -6,7 +6,7 @@ var express   = require("express"),
 
 /* GET books listing. */
 router.get("/", (req, res) => {
-    Book.findAll({order: [["createdAt", "DESC"]]})
+    Book.findAll()
         .then(books => res.render("books/index", {
             title : "Books",
             errors: "undefined",
@@ -40,8 +40,11 @@ router.get("/overdue", (req, res) => {
                     loans: loans
                 })
             }
+            else {
+                res.send(404)
+            }
         })
-        .catch(error => res.send(500, error))
+        .catch(error => res.status(500).send(error))
 })
 
 /* GET checked-out books */
@@ -57,14 +60,17 @@ router.get("/checked-out", (req, res) => {
                     loans: loans
                 })
             }
+            else {
+                res.send(404)
+            }
         })
-        .catch(error => res.send(500, error))
+        .catch(error => res.status(500).send(error))
 })
 
 /* POST create book. */
 router.post("/", (req, res) => {
     Book.create(req.body)
-        .then(book => res.redirect("/books/" + book.id))
+        .then(res.redirect("/books/"))
         .catch(error => {
             if (error.name === "SequelizeValidationError") {
                 res.render("books/new", {
@@ -78,7 +84,7 @@ router.post("/", (req, res) => {
 })
 
 /* GET individual book. */
-router.get("/:id", function (req, res) {
+router.get("/:id", function (req, res, next) {
     Book.findById(req.params.id)
         .then(book => {
             if (book) {
@@ -91,11 +97,12 @@ router.get("/:id", function (req, res) {
                     errors         : "undefined",
                     button         : "Update Book",
                 })
-            } else {
+            }
+            else {
                 res.send(404)
             }
         })
-        .catch(error => res.send(500, error))
+        .catch(error => res.status(500).send(error))
 })
 
 /* PUT update book. */
@@ -104,7 +111,8 @@ router.put("/:id", (req, res) => {
         .then(book => {
             if (book) {
                 return book.update(req.body)
-            } else {
+            }
+            else {
                 res.send(404)
             }
         })
@@ -118,11 +126,9 @@ router.put("/:id", (req, res) => {
                     errors: error.errors,
                     title : "Edit Book",
                 })
-            } else {
-                throw error
             }
         })
-        .catch(error => res.send(500, error))
+        .catch(error => res.status(500).send(error))
 })
 
 module.exports = router

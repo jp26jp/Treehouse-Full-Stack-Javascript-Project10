@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
                 isInt   : {msg: "Value must be a year (e.g. 2018"},
             }
         }
-    }, {})
+    }, {timestamps: false})
     Book.associate = function (models) {
         Book.hasMany(models.Loan, {foreignKey: "book_id"})
     }

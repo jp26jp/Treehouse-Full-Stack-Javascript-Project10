@@ -9,10 +9,15 @@ let express   = require("express"),
 router.get("/", (req, res) => {
     Loan.findAll({include: [{all: true}]})
         .then(loans => {
-            res.render("loans/index", {
-                title: "Loans",
-                loans: loans,
-            })
+            if (loans) {
+                res.render("loans/index", {
+                    title: "Loans",
+                    loans: loans,
+                })
+            }
+            else {
+                res.send(404)
+            }
         })
 })
 
@@ -27,11 +32,15 @@ router.get("/overdue", (req, res) => {
                      }
                  })
         .then(loans => {
-            console.log(loans)
-            res.render("loans/index", {
-                title: "Overdue Loans",
-                loans: loans,
-            })
+            if (loans) {
+                res.render("loans/index", {
+                    title: "Overdue Loans",
+                    loans: loans,
+                })
+            }
+            else {
+                res.send(404)
+            }
         })
 })
 
@@ -42,10 +51,15 @@ router.get("/checked-out", (req, res) => {
                      where  : {returned_on: null}
                  })
         .then(loans => {
-            res.render("loans/index", {
-                title: "Checked Out Loans",
-                loans: loans,
-            })
+            if (loans) {
+                res.render("loans/index", {
+                    title: "Checked Out Loans",
+                    loans: loans,
+                })
+            }
+            else {
+                res.send(404)
+            }
         })
 })
 
@@ -108,39 +122,6 @@ router.post("/", (req, res) => {
         })
 })
 
-/* GET individual loan. */
-router.get("/:id", function (req, res) {
-    Loan.findById(req.params.id)
-        .then(loan => {
-            if (loan) {
-                res.render("loans/show", {
-                    loan     : loan,
-                    book_id  : loan.book_id,
-                    patron_id: loan.patron_id,
-                    loaned_on: loan.loaned_on,
-                    return_by: loan.return_by,
-                    errors   : "undefined",
-                })
-            } else {
-                res.send(404)
-            }
-        })
-        .catch(error => res.send(500).send(error))
-})
-
-router.delete("/:id", function (req, res) {
-    Loan.findById(req.params.id)
-        .then(loan => {
-            if (loan) {
-                return loan.destroy()
-            }
-            else {
-                res.send(404)
-            }
-        })
-        .then(() => res.redirect("/loans"))
-})
-
 router.get("/return/:id", function (req, res) {
     Loan.findById((req.params.id), {
             include: [{all: true}],
@@ -156,6 +137,9 @@ router.get("/return/:id", function (req, res) {
                     button   : "Return Book",
                 })
             }
+            else {
+                res.send(404)
+            }
         })
 })
 
@@ -164,6 +148,9 @@ router.put("/return/:id", function (req, res) {
         .then(loan => {
             if (loan) {
                 return loan.update(req.body)
+            }
+            else {
+                res.send(404)
             }
         })
         .then(() => res.redirect("/loans/"))

@@ -4,14 +4,14 @@ const Patron = require("../models").Patron
 
 /* GET patrons listing. */
 router.get("/", (req, res) => {
-    Patron.findAll({order: [["createdAt", "DESC"]]})
+    Patron.findAll()
           .then(patrons => {
               res.render("patrons/index", {
                   title  : "Patrons",
                   patrons: patrons,
               })
           })
-          .catch(error => res.send(500, error))
+          .catch(error => res.status(500).send(error))
 })
 
 /* Create a new patron form. */
@@ -60,7 +60,7 @@ router.get("/:id", function (req, res) {
                   res.send(404)
               }
           })
-          .catch(error => res.send(500, error))
+          .catch(error => res.status(500).send(error))
 })
 
 /* PUT update patron. */
@@ -87,7 +87,7 @@ router.put("/:id", (req, res) => {
                   throw error
               }
           })
-          .catch(error => res.send(500, error))
+          .catch(error => res.status(500).send(error))
 })
 
 module.exports = router

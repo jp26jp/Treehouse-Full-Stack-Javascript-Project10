@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
             type     : DataTypes.DATE,
             allowNull: true,
         }
-    }, {})
+    }, {timestamps: false})
     Loan.associate = function (models) {
         Loan.belongsTo(models.Book, {foreignKey: "book_id"})
         Loan.belongsTo(models.Patron, {foreignKey: "patron_id"})

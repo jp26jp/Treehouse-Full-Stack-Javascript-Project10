@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
                 isInt   : {msg: "Value must be a zip code (e.g. 84108"},
             }
         }
-    }, {})
+    }, {timestamps: false})
     Patron.associate = function (models) {
         Patron.hasMany(models.Loan, {foreignKey: "patron_id"})
     }
