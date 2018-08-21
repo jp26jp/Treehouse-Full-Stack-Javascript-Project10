@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
             errors: "undefined",
             books : books,
         }))
-        .catch(error => res.send(500, error))
+        .catch(error => res.status(500).send(error))
 })
 
 /* Create a new book form. */
