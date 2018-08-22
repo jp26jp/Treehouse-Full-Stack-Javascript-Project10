@@ -5,7 +5,7 @@ block vars
 
 block content
     p
-        a(href="/loans/new/", class="button") Create New Loan
+        a(href="/loans/new/", ="button") Create New Loan
     include ../components/includes/navigations/filter
     table
         thead
@@ -17,7 +17,7 @@ block content
                 th Returned On
                 th Action
         tbody
-            if loans.length !== "undefined"
+            if loans !== undefined
                 each loan in loans
                     tr
                         td: a(href="/books/" + loan.id)

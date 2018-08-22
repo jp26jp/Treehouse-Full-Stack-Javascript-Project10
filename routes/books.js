@@ -4,26 +4,80 @@ var express   = require("express"),
     Book      = require("../models").Book,
     Loan      = require("../models").Loan
 
-/* GET books listing. */
+/* GET index */
 router.get("/", (req, res) => {
     Book.findAll()
-        .then(books => res.render("books/index", {
-            title : "Books",
-            errors: "undefined",
-            books : books,
-        }))
+        .then(books => {
+            res.render("books/index", {title: "Books", books: books})
+        })
         .catch(error => res.status(500).send(error))
 })
 
-/* Create a new book form. */
-router.get("/new", (req, res) => res.render("books/new", {
-    title : "New Book",
-    errors: "undefined",
-    button: "Create New Book",
-    book  : {}
-}))
+/* GET new */
+router.get("/new", (req, res) => {
+    res.render("books/new", {
+        title: "New Book", button: "Create New Book", book: {}
+    })
+})
 
-/* GET overdue books */
+/* POST new */
+router.post("/new", (req, res) => {
+    Book.create(req.body)
+        .then(book => res.redirect("/books/"))
+        .catch(error => {
+            if (error.name === "SequelizeValidationError") {
+                res.render("books/new", {
+                    title: "New Book", book: Book.build(req.body), errors: error.errors, button: "Create New Book",
+                })
+            }
+        })
+})
+
+/* GET id */
+router.get("/:id", (req, res) => {
+    Book.findById(req.params.id)
+        .then(book => {
+            if (book) {
+                res.render("books/show", {
+                    title : book.title,
+                    book  : book,
+                    button: "Update Book",
+                })
+            }
+            else {
+                res.send(404)
+            }
+        })
+        .catch(error => res.status(500).send(error))
+})
+
+/* PUT id */
+router.put("/:id", (req, res) => {
+    Book.findById(req.params.id)
+        .then(book => {
+            if (book) {
+                return book.update(req.body)
+            }
+            else {
+                res.send(404)
+            }
+        })
+        .then(book => res.redirect("/books/"))
+        .catch(error => {
+            if (error.name === "SequelizeValidationError") {
+                let book = Book.build(req.body)
+                book.id = req.params.id
+                res.render("books/new", {
+                    title : book.title,
+                    book  : book,
+                    errors: error.errors,
+                    button: "Update Book",
+                })
+            }
+        })
+})
+
+/* GET overdue */
 router.get("/overdue", (req, res) => {
     const Op = Sequelize.Op
     Loan.findAll({
@@ -47,7 +101,7 @@ router.get("/overdue", (req, res) => {
         .catch(error => res.status(500).send(error))
 })
 
-/* GET checked-out books */
+/* GET checked-out */
 router.get("/checked-out", (req, res) => {
     Loan.findAll({
                      include: [{model: Book}],
@@ -67,68 +121,6 @@ router.get("/checked-out", (req, res) => {
         .catch(error => res.status(500).send(error))
 })
 
-/* POST create book. */
-router.post("/", (req, res) => {
-    Book.create(req.body)
-        .then(res.redirect("/books/"))
-        .catch(error => {
-            if (error.name === "SequelizeValidationError") {
-                res.render("books/new", {
-                    title : "New Book",
-                    book  : Book.build(req.body),
-                    errors: error.errors,
-                    button: "Create New Book",
-                })
-            }
-        })
-})
-
-/* GET individual book. */
-router.get("/:id", function (req, res, next) {
-    Book.findById(req.params.id)
-        .then(book => {
-            if (book) {
-                res.render("books/show", {
-                    book           : book,
-                    title          : book.title,
-                    author         : book.author,
-                    genre          : book.genre,
-                    first_published: book.first_published,
-                    errors         : "undefined",
-                    button         : "Update Book",
-                })
-            }
-            else {
-                res.send(404)
-            }
-        })
-        .catch(error => res.status(500).send(error))
-})
-
-/* PUT update book. */
-router.put("/:id", (req, res) => {
-    Book.findById(req.params.id)
-        .then(book => {
-            if (book) {
-                return book.update(req.body)
-            }
-            else {
-                res.send(404)
-            }
-        })
-        .then(book => res.redirect("/books/" + book.id))
-        .catch(error => {
-            if (error.name === "SequelizeValidationError") {
-                var book = Book.build(req.body)
-                book.id = req.params.id
-                res.render("books/edit", {
-                    book  : book,
-                    errors: error.errors,
-                    title : "Edit Book",
-                })
-            }
-        })
-        .catch(error => res.status(500).send(error))
-})
-
 module.exports = router
+
+

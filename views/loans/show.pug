@@ -4,5 +4,22 @@ block vars
     - var path = "/loans/"
 
 block content
-    form(action="/loans/" + loan.id + "?_method=PUT", method="post")
-        include ../components/includes/forms/loan_form
+    form(action=loan.id + "?_method=PUT", method="post")
+        p
+            strong: label Book Title:
+            input(hidden="true", name="id" value=loan.id)
+            |  #{loan.Book.title}
+        p
+            strong: label Loaned By:
+            input(hidden="true", name="loaned_on" value=loan.loaned_on)
+            |  #{loan.Patron.first_name} #{loan.Patron.last_name}
+        p
+            strong: label Loaned On:
+            input(disabled="true", name="return_by" value=loan.getDateAsString(loan.loaned_on))
+        p
+            strong: label Return By:
+            input(disabled="true", name="return_by" value=loan.getDateAsString(loan.return_by))
+        p
+            label Returned on:
+            input(id="returned_on", name="returned_on" type="text", value=loan.getDate())
+            input(type="submit", value=button)
