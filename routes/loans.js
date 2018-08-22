@@ -7,12 +7,17 @@ let express   = require("express"),
 
 /* GET loans listing. */
 router.get("/", (req, res) => {
-    Loan.findAll()
+    Loan.findAll({include: [{all: true}]})
         .then(loans => {
-            res.render("loans/index", {
-                title: "Loans",
-                loans: loans,
-            })
+            if (loans) {
+                res.render("loans/index", {
+                    title: "Loans",
+                    loans: loans,
+                })
+            }
+            else {
+                res.send(404)
+            }
         })
 })
 
@@ -27,10 +32,15 @@ router.get("/overdue", (req, res) => {
                      }
                  })
         .then(loans => {
-            res.render("loans/index", {
-                title: "Overdue",
-                loans: loans,
-            })
+            if (loans) {
+                res.render("loans/index", {
+                    title: "Overdue Loans",
+                    loans: loans,
+                })
+            }
+            else {
+                res.send(404)
+            }
         })
 })
 
@@ -38,39 +48,43 @@ router.get("/overdue", (req, res) => {
 router.get("/checked-out", (req, res) => {
     Loan.findAll({
                      include: [{all: true}],
-                     where  : {
-                         returned_on: null
-                     }
+                     where  : {returned_on: null}
                  })
         .then(loans => {
-            console.log(loans)
-            res.render("loans/index", {
-                title: "Checked Out",
-                loans: loans,
-            })
+            if (loans) {
+                res.render("loans/index", {
+                    title: "Checked Out Loans",
+                    loans: loans,
+                })
+            }
+            else {
+                res.send(404)
+            }
         })
 })
 
 /* Create a new loan form. */
 router.get("/new", (req, res) => {
     const promiseBooks   = new Promise(resolve => {
-              Book.findAll({include: [{all: true}]})
+              Book.findAll({
+                               include: [{all: true}]
+                           })
                   .then(books => {
                       const availableBooks = books.filter(book => {
-
+                
                           let loans = book.dataValues.Loans
-
+                
                           // if true, a loan exist and we need to check if any have not been returned
                           if (loans.length) {
                               for (let i = 0; i < loans.length; i++) {
-
+                        
                                   // if a book has not been returned, remove it from the array
                                   if (loans[i].dataValues.returned_on === null) {
                                       return false
                                   }
                               }
                           }
-
+                
                           // if no loan exists OR all book loans have been returned, add the book to the array
                           return true
                       })
@@ -78,7 +92,7 @@ router.get("/new", (req, res) => {
                   })
           }),
           promisePatrons = getAllPatrons()
-
+    
     renderNewLoanPage(res, promiseBooks, promisePatrons, "Create New Loan")
 })
 
@@ -90,55 +104,22 @@ router.post("/", (req, res) => {
             if (error.name === "SequelizeValidationError") {
                 const promiseBooks   = getAllBooks(),
                       promisePatrons = getAllPatrons()
-
+            
                 Promise.all([promiseBooks, promisePatrons])
                        .then(results => {
                            res.render("loans/new", {
                                title  : "New Loan",
-                               loan   : Loan.build(req.body),
-                               books  : results[0],
+                               books  : filterCheckedOutBooks(results[0]),
                                patrons: results[1],
+                               loan   : Loan.build(req.body),
                                errors : error.errors,
                                button : "Create New Loan",
                            })
                        })
-
+            
                 renderNewLoanPage(res, promiseBooks, promisePatrons, "Create New Loan", error.errors)
             }
         })
-})
-
-/* GET individual loan. */
-router.get("/:id", function (req, res) {
-    Loan.findById(req.params.id)
-        .then(loan => {
-            if (loan) {
-                res.render("loans/show", {
-                    loan     : loan,
-                    book_id  : loan.book_id,
-                    patron_id: loan.patron_id,
-                    loaned_on: loan.loaned_on,
-                    return_by: loan.return_by,
-                    errors   : "undefined",
-                })
-            } else {
-                res.send(404)
-            }
-        })
-        .catch(error => res.send(500).send(error))
-})
-
-router.delete("/:id", function (req, res) {
-    Loan.findById(req.params.id)
-        .then(loan => {
-            if (loan) {
-                return loan.destroy()
-            }
-            else {
-                res.send(404)
-            }
-        })
-        .then(() => res.redirect("/loans"))
 })
 
 router.get("/return/:id", function (req, res) {
@@ -156,6 +137,9 @@ router.get("/return/:id", function (req, res) {
                     button   : "Return Book",
                 })
             }
+            else {
+                res.send(404)
+            }
         })
 })
 
@@ -164,6 +148,9 @@ router.put("/return/:id", function (req, res) {
         .then(loan => {
             if (loan) {
                 return loan.update(req.body)
+            }
+            else {
+                res.send(404)
             }
         })
         .then(() => res.redirect("/loans/"))
@@ -195,6 +182,27 @@ function renderNewLoanPage(expressResponse, books, patrons, buttonText, errors =
                    loan   : {},
                })
            })
+}
+
+function filterCheckedOutBooks(books) {
+    return books.filter(book => {
+    
+        let loans = book.dataValues.Loans
+    
+        // if true, a loan exist and we need to check if any have not been returned
+        if (loans.length) {
+            for (let i = 0; i < loans.length; i++) {
+            
+                // if a book has not been returned, remove it from the array
+                if (loans[i].dataValues.returned_on === null) {
+                    return false
+                }
+            }
+        }
+    
+        // if no loan exists OR all book loans have been returned, add the book to the array
+        return true
+    })
 }
 
 module.exports = router

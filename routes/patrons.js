@@ -2,26 +2,32 @@ const express = require("express")
 const router = express.Router()
 const Patron = require("../models").Patron
 
-/* GET index */
+/* GET patrons listing. */
 router.get("/", (req, res) => {
     Patron.findAll()
           .then(patrons => {
-              res.render("patrons/index", {title: "Patrons", patrons: patrons})
+              res.render("patrons/index", {
+                  title  : "Patrons",
+                  patrons: patrons,
+              })
           })
           .catch(error => res.status(500).send(error))
 })
 
-/* GET new */
+/* Create a new patron form. */
 router.get("/new", (req, res) => {
     res.render("patrons/new", {
-        title: "New Patron", button: "Create New Patron", patron: {}
+        title : "New Patron",
+        errors: "undefined",
+        button: "Create New Patron",
+        patron: {},
     })
 })
 
-/* POST new */
-router.post("/new", (req, res) => {
+/* POST create patron. */
+router.post("/", (req, res) => {
     Patron.create(req.body)
-          .then(patron => res.redirect("/patrons/"))
+          .then(patron => res.redirect("/patrons/" + patron.id))
           .catch(error => {
               if (error.name === "SequelizeValidationError") {
                   res.render("patrons/new", {
@@ -34,48 +40,54 @@ router.post("/new", (req, res) => {
           })
 })
 
-/* GET id */
-router.get("/:id", (req, res) => {
+/* GET individual patron. */
+router.get("/:id", function (req, res) {
     Patron.findById(req.params.id)
           .then(patron => {
               if (patron) {
                   res.render("patrons/show", {
-                      title : patron.title,
-                      patron: patron,
-                      button: "Update Patron",
+                      patron    : patron,
+                      first_name: patron.first_name,
+                      last_name : patron.last_name,
+                      address   : patron.address,
+                      email     : patron.email,
+                      library_id: patron.library_id,
+                      zip_code  : patron.zip_code,
+                      button    : "Update Patron",
+                      errors    : "undefined",
                   })
-              }
-              else {
+              } else {
                   res.send(404)
               }
           })
           .catch(error => res.status(500).send(error))
 })
 
-/* PUT id */
+/* PUT update patron. */
 router.put("/:id", (req, res) => {
     Patron.findById(req.params.id)
           .then(patron => {
               if (patron) {
                   return patron.update(req.body)
-              }
-              else {
+              } else {
                   res.send(404)
               }
           })
-          .then(patron => res.redirect("/patrons/"))
+          .then(patron => res.redirect("/patrons/" + patron.id))
           .catch(error => {
               if (error.name === "SequelizeValidationError") {
-                  let patron = Patron.build(req.body)
+                  var patron = Patron.build(req.body)
                   patron.id = req.params.id
-                  res.render("patrons/new", {
-                      title : patron.title,
+                  res.render("patrons/edit", {
                       patron: patron,
                       errors: error.errors,
-                      button: "Update Patron",
+                      title : "Edit Patron",
                   })
+              } else {
+                  throw error
               }
           })
+          .catch(error => res.status(500).send(error))
 })
 
 module.exports = router
