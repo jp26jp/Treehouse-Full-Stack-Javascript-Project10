@@ -37,16 +37,20 @@ router.post("/new", (req, res) => {
 router.get("/:id", (req, res) => {
     Book.findById(req.params.id)
         .then(book => {
-            if (book) {
-                res.render("books/show", {
-                    title : book.title,
-                    book  : book,
-                    button: "Update Book",
+            Loan.findAll({include: [{all: true}], where: {book_id: req.params.id}})
+                .then(loans => {
+                    if (book) {
+                        res.render("books/show", {
+                            title : book.title,
+                            book  : book,
+                            loans : loans,
+                            button: "Update Book",
+                        })
+                    }
+                    else {
+                        res.send(404)
+                    }
                 })
-            }
-            else {
-                res.send(404)
-            }
         })
         .catch(error => res.status(500).send(error))
 })

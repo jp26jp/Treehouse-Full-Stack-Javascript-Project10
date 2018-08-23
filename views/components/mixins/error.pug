@@ -1,5 +1,5 @@
 mixin error(path)
-    if errors !== "undefined"
+    if errors !== undefined
         each error in errors
             if error.path === path
                 .error= error.message

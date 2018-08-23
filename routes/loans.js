@@ -5,135 +5,70 @@ let express   = require("express"),
     Book      = require("../models").Book,
     Patron    = require("../models").Patron
 
-/* GET loans listing. */
+/* GET index */
 router.get("/", (req, res) => {
     Loan.findAll({include: [{all: true}]})
         .then(loans => {
-            if (loans) {
-                res.render("loans/index", {
-                    title: "Loans",
-                    loans: loans,
-                })
-            }
-            else {
-                res.send(404)
-            }
+            res.render("loans/index", {title: "Loans", loans: loans})
         })
+        .catch(error => res.status(500).send(error))
 })
 
-/* GET overdue listing. */
-router.get("/overdue", (req, res) => {
-    const Op = Sequelize.Op
-    Loan.findAll({
-                     include: [{all: true}],
-                     where  : {
-                         return_by  : {[Op.lt]: new Date()},
-                         returned_on: null
-                     }
-                 })
-        .then(loans => {
-            if (loans) {
-                res.render("loans/index", {
-                    title: "Overdue Loans",
-                    loans: loans,
-                })
-            }
-            else {
-                res.send(404)
-            }
-        })
-})
-
-/* GET checked-out listing. */
-router.get("/checked-out", (req, res) => {
-    Loan.findAll({
-                     include: [{all: true}],
-                     where  : {returned_on: null}
-                 })
-        .then(loans => {
-            if (loans) {
-                res.render("loans/index", {
-                    title: "Checked Out Loans",
-                    loans: loans,
-                })
-            }
-            else {
-                res.send(404)
-            }
-        })
-})
-
-/* Create a new loan form. */
+/* GET new */
 router.get("/new", (req, res) => {
-    const promiseBooks   = new Promise(resolve => {
-              Book.findAll({
-                               include: [{all: true}]
-                           })
-                  .then(books => {
-                      const availableBooks = books.filter(book => {
-                
-                          let loans = book.dataValues.Loans
-                
-                          // if true, a loan exist and we need to check if any have not been returned
-                          if (loans.length) {
-                              for (let i = 0; i < loans.length; i++) {
-                        
-                                  // if a book has not been returned, remove it from the array
-                                  if (loans[i].dataValues.returned_on === null) {
-                                      return false
-                                  }
-                              }
-                          }
-                
-                          // if no loan exists OR all book loans have been returned, add the book to the array
-                          return true
-                      })
-                      resolve(availableBooks)
-                  })
-          }),
+    const promiseBooks   = getAllAvailableBooks(),
           promisePatrons = getAllPatrons()
-    
     renderNewLoanPage(res, promiseBooks, promisePatrons, "Create New Loan")
 })
 
-/* POST create loan. */
-router.post("/", (req, res) => {
+/* POST new */
+router.post("/new", (req, res) => {
     Loan.create(req.body)
-        .then(loan => res.redirect("/loans/return/" + loan.id))
+        .then(loan => res.redirect("/loans/"))
         .catch(error => {
             if (error.name === "SequelizeValidationError") {
-                const promiseBooks   = getAllBooks(),
+                const promiseBooks   = getAllAvailableBooks(),
                       promisePatrons = getAllPatrons()
-            
                 Promise.all([promiseBooks, promisePatrons])
                        .then(results => {
                            res.render("loans/new", {
                                title  : "New Loan",
-                               books  : filterCheckedOutBooks(results[0]),
+                               books  : results[0],
                                patrons: results[1],
                                loan   : Loan.build(req.body),
                                errors : error.errors,
                                button : "Create New Loan",
                            })
                        })
-            
                 renderNewLoanPage(res, promiseBooks, promisePatrons, "Create New Loan", error.errors)
             }
         })
 })
 
-router.get("/return/:id", function (req, res) {
-    Loan.findById((req.params.id), {
-            include: [{all: true}],
+/* GET overdue */
+router.get("/overdue", (req, res) => {
+    const Op = Sequelize.Op
+    Loan.findAll({include: [{all: true}], where: {return_by: {[Op.lt]: new Date()}, returned_on: null}})
+        .then(loans => {
+            res.render("loans/index", {title: "Overdue Loans", loans: loans})
         })
+})
+
+/* GET checked-out */
+router.get("/checked-out", (req, res) => {
+    Loan.findAll({include: [{all: true}], where  : {returned_on: null}})
+        .then(loans => {
+            res.render("loans/index", {title: "Checked Out Loans", loans: loans})
+        })
+})
+
+/* GET return/:id */
+router.get("/return/:id", (req, res) => {
+    Loan.findById(req.params.id, {include: [{all: true}]})
         .then(loan => {
             if (loan) {
-                res.render("loans/return", {
+                res.render("loans/show", {
                     loan     : loan,
-                    book_id  : loan.book_id,
-                    patron_id: loan.patron_id,
-                    loaned_on: loan.loaned_on,
-                    return_by: loan.return_by,
                     button   : "Return Book",
                 })
             }
@@ -141,9 +76,11 @@ router.get("/return/:id", function (req, res) {
                 res.send(404)
             }
         })
+        .catch(error => res.status(500).send(error))
 })
 
-router.put("/return/:id", function (req, res) {
+/* PUT return/:id */
+router.put("/return/:id", (req, res) => {
     Loan.findById(req.params.id)
         .then(loan => {
             if (loan) {
@@ -154,12 +91,13 @@ router.put("/return/:id", function (req, res) {
             }
         })
         .then(() => res.redirect("/loans/"))
+        .catch(error => res.status(500).send(error))
 })
 
-function getAllBooks() {
+function getAllAvailableBooks() {
     return new Promise(resolve => {
         Book.findAll({include: [{all: true}]})
-            .then(books => resolve(books))
+            .then(books => resolve(filterCheckedOutBooks(books)))
     })
 }
 
@@ -170,10 +108,10 @@ function getAllPatrons() {
     })
 }
 
-function renderNewLoanPage(expressResponse, books, patrons, buttonText, errors = "undefined") {
+function renderNewLoanPage(res, books, patrons, buttonText, errors = "undefined") {
     Promise.all([books, patrons])
            .then(results => {
-               expressResponse.render("loans/new", {
+               res.render("loans/new", {
                    title  : "New Loan",
                    books  : results[0],
                    errors : errors,
@@ -186,20 +124,16 @@ function renderNewLoanPage(expressResponse, books, patrons, buttonText, errors =
 
 function filterCheckedOutBooks(books) {
     return books.filter(book => {
-    
         let loans = book.dataValues.Loans
-    
         // if true, a loan exist and we need to check if any have not been returned
         if (loans.length) {
             for (let i = 0; i < loans.length; i++) {
-            
                 // if a book has not been returned, remove it from the array
                 if (loans[i].dataValues.returned_on === null) {
                     return false
                 }
             }
         }
-    
         // if no loan exists OR all book loans have been returned, add the book to the array
         return true
     })

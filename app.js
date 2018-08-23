@@ -6,7 +6,6 @@ const createError    = require("http-errors"),
       methodOverride = require("method-override")
 
 const indexRouter   = require("./routes/index"),
-      usersRouter   = require("./routes/users"),
       booksRouter   = require("./routes/books"),
       loansRouter   = require("./routes/loans"),
       patronsRouter = require("./routes/patrons")
@@ -24,7 +23,6 @@ app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
 
 app.use("/", indexRouter)
-app.use("/users", usersRouter)
 app.use("/books", booksRouter)
 app.use("/loans", loansRouter)
 app.use("/patrons", patronsRouter)

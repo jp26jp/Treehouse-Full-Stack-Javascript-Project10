@@ -6,3 +6,32 @@ block vars
 block content
     form(action="/books/" + book.id + "?_method=PUT", method="post")
         include ../components/includes/forms/book_form
+
+    h2 Loan History
+    table
+        thead
+            tr
+                th Book
+                th Patron
+                th Loaned on
+                th Return by
+                th Returned on
+                th Action
+
+
+        tbody
+            if loans.length !== "undefined"
+                each loan in loans
+                    tr
+                        td: a(href="/books/" + loan.id)
+                            = loan.Book.title
+                        td: a(href="/patrons/" + loan.Patron.id)
+                            = `${loan.Patron.first_name} ${loan.Patron.last_name}`
+                        td= loan.getDateAsString(loan.loaned_on)
+                        td= loan.getDateAsString(loan.return_by)
+                        td
+                            if loan.returned_on !== null
+                                = loan.getDateAsString(loan.returned_on)
+                        td
+                            if !loan.returned_on
+                                a.button(href="/loans/return/" + loan.id) Return Book

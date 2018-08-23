@@ -20,7 +20,7 @@ block content
             if loans.length !== "undefined"
                 each loan in loans
                     tr
-                        td: a(href="/books/" + loan.id)
+                        td: a(href="/books/" + loan.Book.id)
                             = loan.Book.title
                         td: a(href="/patrons/" + loan.Patron.id)
                             = `${loan.Patron.first_name} ${loan.Patron.last_name}`

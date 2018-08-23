@@ -4,5 +4,5 @@ block vars
     - var path = "/loans/"
 
 block content
-    form(action="/loans/" + loan.id + "?_method=PUT", method="post")
-        include ../components/includes/forms/loan_form
+    form(action=loan.id + "?_method=PUT", method="post")
+        include ../components/includes/forms/return_form
