@@ -29,17 +29,6 @@ router.post("/new", (req, res) => {
             if (error.name === "SequelizeValidationError") {
                 const promiseBooks   = getAllAvailableBooks(),
                       promisePatrons = getAllPatrons()
-                Promise.all([promiseBooks, promisePatrons])
-                       .then(results => {
-                           res.render("loans/new", {
-                               title  : "New Loan",
-                               books  : results[0],
-                               patrons: results[1],
-                               loan   : Loan.build(req.body),
-                               errors : error.errors,
-                               button : "Create New Loan",
-                           })
-                       })
                 renderNewLoanPage(res, promiseBooks, promisePatrons, "Create New Loan", error.errors)
             }
         })
@@ -56,7 +45,7 @@ router.get("/overdue", (req, res) => {
 
 /* GET checked-out */
 router.get("/checked-out", (req, res) => {
-    Loan.findAll({include: [{all: true}], where  : {returned_on: null}})
+    Loan.findAll({include: [{all: true}], where: {returned_on: null}})
         .then(loans => {
             res.render("loans/index", {title: "Checked Out Loans", loans: loans})
         })
@@ -68,8 +57,8 @@ router.get("/return/:id", (req, res) => {
         .then(loan => {
             if (loan) {
                 res.render("loans/show", {
-                    loan     : loan,
-                    button   : "Return Book",
+                    loan  : loan,
+                    button: "Return Book",
                 })
             }
             else {
@@ -111,13 +100,19 @@ function getAllPatrons() {
 function renderNewLoanPage(res, books, patrons, buttonText, errors = "undefined") {
     Promise.all([books, patrons])
            .then(results => {
+               const date       = new Date(),
+                     futureDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 7),
+                     loaned_on  = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`,
+                     return_by  = `${futureDate.getUTCFullYear()}-${futureDate.getUTCMonth() + 1}-${futureDate.getUTCDate()}`
                res.render("loans/new", {
-                   title  : "New Loan",
-                   books  : results[0],
-                   errors : errors,
-                   patrons: results[1],
-                   button : buttonText,
-                   loan   : {},
+                   title    : "New Loan",
+                   books    : results[0],
+                   errors   : errors,
+                   patrons  : results[1],
+                   button   : buttonText,
+                   loaned_on: loaned_on,
+                   return_by: return_by,
+                   loan     : {},
                })
            })
 }

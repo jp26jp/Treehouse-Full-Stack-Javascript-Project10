@@ -4,24 +4,20 @@ p
         select(name="book_id", id="book_id")
             each book in books
                 option(value=book.id) #{book.title}
-    else
-        input(name="book_title", type="text", value=loan.book_title)
 p
     label(for='patron_id') Patron
     if patrons !== undefined
         select(name="patron_id", id="patron_id")
             each patron in patrons
                 option(value=patron.id) #{patron.first_name} #{patron.last_name}
-    else
-        input(name="patron_name", type="text", value=loan.patron_id)
 p
     label(for='loaned_on') Loaned on:
-    input(name="loaned_on", id="loaned_on", type="text", value=loan.loaned_on)
+    input(name="loaned_on", id="loaned_on", type="text", value=loaned_on)
     +error("loaned_on")
 
 p
     label(for='return_by') Return by:
-    input(name="return_by", id="return_by", type="text", value=loan.return_by)
+    input(name="return_by", id="return_by", type="text", value=return_by)
     +error("return_by")
 
 p
